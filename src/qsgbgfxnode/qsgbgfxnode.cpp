@@ -93,7 +93,7 @@ void QSGBgfxNode::sync()
 #endif
         case bgfx::RendererType::OpenGL:
 #ifdef __linux__
-            qsgtexture = QNativeInterface::QSGOpenGLTexture::fromNative(texture, window, QSize(width, width), QQuickWindow::TextureHasAlphaChannel);
+            qsgtexture = QNativeInterface::QSGOpenGLTexture::fromNative((ptrdiff_t)m_texture, m_window, QSize(width, width), QQuickWindow::TextureHasAlphaChannel);
 #endif
             break;
         default:
