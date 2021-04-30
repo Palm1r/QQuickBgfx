@@ -5,14 +5,13 @@
 #include <QQuickView>
 
 #include <bgfx/bgfx.h>
-#include <qquick_bgfx.h>
 #include <bx/bx.h>
 #include <debugdraw/debugdraw.h>
 
 //init_example initialize bgfx from a gien bgfx::Init
 void init_example(const bgfx::Init& init)
 {
-    if (!QQuickBgfx::initialized())
+    if (!QQuickBgfx::isBgfxInit())
     {
         bgfx::renderFrame();
         bgfx::init(init);

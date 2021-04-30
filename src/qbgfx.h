@@ -11,6 +11,20 @@ class QQmlEngine;
 class QQuickWindow;
 
 namespace QQuickBgfx {
+
+inline bool isBgfxInit()
+{
+    return bgfx::getInternalData()->context;
+}
+
+inline void frame()
+{
+    if (isBgfxInit())
+    {
+        bgfx::frame();
+    }
+}
+
 class QBgfx : public QObject
 {
     Q_OBJECT
@@ -21,7 +35,6 @@ public:
     ~QBgfx();
 
 private slots:
-
     void renderFrame();
     void shutdown();
     void init();

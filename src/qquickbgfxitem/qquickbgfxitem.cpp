@@ -1,7 +1,7 @@
 #include "qquickbgfxitem.h"
 
-#include "qquick_bgfx.h"
 #include "qsgbgfxnode/qsgbgfxnode.h"
+#include "qbgfx.h"
 
 QQuickBgfxItem::QQuickBgfxItem()
 {
@@ -28,7 +28,7 @@ QSGNode *QQuickBgfxItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *
 {
     QSGBgfxNode *node = static_cast<QSGBgfxNode *>(oldNode);
     const auto size = boundingRect().size().toSize();
-    if (!QQuickBgfx::initialized() || (!node && (size.width() <= 0 || size.height() <= 0)))
+    if (!QQuickBgfx::isBgfxInit() || (!node && (size.width() <= 0 || size.height() <= 0)))
     {
         return node;
     }

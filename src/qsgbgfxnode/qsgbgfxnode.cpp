@@ -1,7 +1,6 @@
 #include "qsgbgfxnode.h"
 
 #include "qbgfx.h"
-#include <qquick_bgfx.h>
 
 #include <bgfx/platform.h>
 
@@ -85,16 +84,16 @@ void QSGBgfxNode::sync()
         {
         case bgfx::RendererType::Metal:
 #ifdef __APPLE__
-            qsgtexture = QQuickBgfx::qsgTexture<bgfx::RendererType::Metal>(m_texture, m_window, width, height);
+            qsgtexture = QNativeInterface::QSGMetalTexture::fromNative(static_cast<id<MTLTexture>>(m_texture), m_window, {width, height});
 #endif
             break;
         case bgfx::RendererType::Direct3D11:
 #ifdef _WIN32
-            qsgtexture = QQuickBgfx::qsgTexture<bgfx::RendererType::Direct3D11>(m_texture, m_window, width, height);
+           qsgtexture = QNativeInterface::QSGD3D11Texture::fromNative(m_texture, m_window, { width, height });
 #endif
         case bgfx::RendererType::OpenGL:
 #ifdef __linux__
-            qsgtexture = QQuickBgfx::qsgTexture<bgfx::RendererType::OpenGL>((uintptr_t)m_texture, m_window, width, height);
+            qsgtexture = QNativeInterface::QSGOpenGLTexture::fromNative(texture, window, QSize(width, width), QQuickWindow::TextureHasAlphaChannel);
 #endif
             break;
         default:

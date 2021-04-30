@@ -1,6 +1,5 @@
 #include <qbgfx.h>
 
-#include "qquick_bgfx.h"
 #include "qquickbgfxitem/qquickbgfxitem.h"
 
 #include <bgfx/bgfx.h>
@@ -9,6 +8,10 @@
 #include <QQuickWindow>
 //#include <QGuiApplication>
 #include <stdexcept>
+
+#ifdef _WIN32
+#include <d3d11.h>
+#endif
 
 using namespace QQuickBgfx;
 
@@ -36,37 +39,40 @@ void QBgfx::init()
     const auto dpr = m_window->effectiveDevicePixelRatio();
     auto winHandle = reinterpret_cast<void *>(m_window->winId());
     auto context = static_cast<void *>(rif->getResource(m_window, QSGRendererInterface::DeviceResource));
-    
-    switch (rif->graphicsApi())
+
+    if (!isBgfxInit())
     {
-    case QSGRendererInterface::MetalRhi:
-#ifdef __APPLE__
-        m_bgfxInit = QQuickBgfx::init<bgfx::RendererType::Metal>(winHandle, context, m_window->width() * dpr,
-                                                                 m_window->height() * dpr);
-#endif
-        break;
-    case QSGRendererInterface::Direct3D11Rhi:
+        bgfx::Init init;
+        init.resolution.reset = BGFX_RESET_VSYNC;
+        init.resolution.width = m_window->width() * dpr;
+        init.resolution.height = m_window->height() * dpr;
+
 #ifdef _WIN32
-        m_bgfxInit = QQuickBgfx::init<bgfx::RendererType::Direct3D11>(winHandle, context, m_window->width() * dpr,
-                                                                      m_window->height() * dpr);
+        init.type = bgfx::RendererType::Direct3D11;
+        init.platformData.context = reinterpret_cast<ID3D11Device*>(context);
 #endif
-    case QSGRendererInterface::OpenGL:
+
 #ifdef __linux__
-        m_bgfxInit = QQuickBgfx::init<bgfx::RendererType::OpenGL>(winHandle, context, m_window->width() * dpr,
-                                                                  m_window->height() * dpr);
+        init.type = bgfx::RendererType::OpenGL;
+        init.platformData.context = QOpenGLContext::currentContext();
 #endif
-        break;
-    default:
-        throw std::runtime_error("Invalid or not implemented Graphics Api");
-        return;
+
+#ifdef __APPLE__
+        init.type = bgfx::RendererType::Metal;
+        init.platformData.nwh = reinterpret_cast<CAMetalLayer *>(reinterpret_cast<NSView *>(windowHandler).layer);
+        init.platformData.context = static_cast<id<MTLDevice>>(context);
+#endif
+        m_bgfxInit = init;
     }
+    else
+        m_bgfxInit = bgfx::Init();
 
     emit initialized(m_bgfxInit);
 }
 
 void QBgfx::renderFrame()
 {
-    if (!QQuickBgfx::initialized())
+    if (!QQuickBgfx::isBgfxInit())
         return;
 
     m_window->beginExternalCommands();
@@ -76,7 +82,7 @@ void QBgfx::renderFrame()
 
 void QBgfx::shutdown()
 {
-    if (QQuickBgfx::initialized())
+    if (QQuickBgfx::isBgfxInit())
     {
         bgfx::shutdown();
     }

@@ -15,36 +15,20 @@ find_package(Qt6 COMPONENTS Qml)
 find_package(Qt6 COMPONENTS Quick)
 
 set(SOURCES
-
     main.cpp
     src/qquickbgfxitem/qquickbgfxitem.h
     src/qquickbgfxitem/qquickbgfxitem.cpp
     src/qbgfx.h
     src/qbgfx.cpp
-    src/qquick_bgfx.h
     src/qsgbgfxnode/qsgbgfxnode.h
     src/qsgbgfxnode/qsgbgfxnode.cpp
+    src/model.h
+    src/model.cpp
+    src/types.h
+    src/binary_reader.h
+    src/openfbx/ofbx.h
+    src/openfbx/ofbx.cpp
 )
-if(APPLE)
-    set(SOURCES
-        ${SOURCES}
-        src/qquick_bgfx.mm
-    )
-endif()
-
-if(WIN32)
-    set(SOURCES
-        ${SOURCES}
-        src/qquick_bgfx.cpp
-    )
-endif()
-
-if(UNIX)
-    set(SOURCES
-        ${SOURCES}
-        src/qquick_bgfx_opengl.cpp
-    )
-endif()
 
 qt_add_executable(BgfxQQuickItemExample
     ${SOURCES}
@@ -60,6 +44,7 @@ target_link_libraries(BgfxQQuickItemExample PUBLIC
     bgfx
     bimg
     example-common
+    glm
 )
 
 target_include_directories(BgfxQQuickItemExample

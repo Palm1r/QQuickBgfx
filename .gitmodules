@@ -4,3 +4,6 @@
 [submodule "deps/brtshaderc"]
 	path = deps/brtshaderc
 	url = git@github.com:fredakilla/brtshaderc.git
+[submodule "deps/glm"]
+	path = deps/glm
+	url = ../../g-truc/glm.git
